@@ -1,12 +1,4 @@
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-
-import java.util.Hashtable;
-
-import java.util.Map.Entry;
 
 public class Player {
     // Set this string to any value you like. It is used as an identifier, listed
@@ -45,14 +37,14 @@ public class Player {
         ArrayList<String> allValues = generateArr(puzzle);
 
         ArrayList<String> possibleVals = allValues;
-        String guess = "111222";
+        String guess = "1112222";
 
         do {
 
             gr = puzzle.guess(guess);
-            possibleVals = removeMoves(possibleVals, gr.incPos, gr.corPos, guess);
+            possibleVals = removeMoves(possibleVals, gr.incPos, gr.corPos, guess, puzzle);
             guess = move(possibleVals);
-
+            System.out.println(possibleVals.size());
             //if (possibleVals.size() < 15) {
           //      System.out.println(possibleVals);
            // }
@@ -65,7 +57,8 @@ public class Player {
         ArrayList<String> x = new ArrayList<String>();
 
         String formatter = "%0" + puzzle.getNumDigits() + "d";
-        for (int i = 0; i < 1000000; i++) {
+        String length = "1" + "0".repeat(puzzle.getNumDigits());
+        for (int i = 0; i < Integer.parseInt(length); i++) {
             x.add(String.format(formatter, i));
         }
 
@@ -79,14 +72,14 @@ public class Player {
 
     }
 
-    public static ArrayList<String> removeMoves(ArrayList<String> x, int incPos, int corPos, String guess) {
+    public static ArrayList<String> removeMoves(ArrayList<String> x, int incPos, int corPos, String guess, Puzzle puzzle) {
         String token = "";
         String correct = "+" + corPos + "-" + incPos;
 
         ArrayList<String> vals = new ArrayList<String>();
         for (int i = 0; i < x.size(); i++) {
             token = x.get(i);
-            if (compare(token, guess).equalsIgnoreCase(correct)) {
+            if (compare(token, guess, puzzle).equalsIgnoreCase(correct)) {
                 vals.add(token);
             }
         }
@@ -94,7 +87,7 @@ public class Player {
         return vals;
     }
 
-    private static String compare(String token, String guess) {
+    private static String compare(String token, String guess, Puzzle puzzle) {
         int corPos = 0;
         int incPos = 0;
         int loc = -1;
@@ -102,7 +95,7 @@ public class Player {
         char[] secretChars = token.toCharArray();
         char[] guessChars = guess.toCharArray();
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < puzzle.getNumDigits(); i++) {
             if (guessChars[i] == secretChars[i]) {
                 corPos++;
                 guessChars[i] = 'X';
@@ -110,7 +103,7 @@ public class Player {
             }
         }
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < puzzle.getNumDigits(); i++) {
             guessChar = guessChars[i];
             loc = getIndex(guessChar, secretChars);
             if ((guessChar != 'X') && (loc >= 0)) {
